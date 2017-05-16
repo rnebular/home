@@ -5,7 +5,7 @@ ENV MINECRAFT_VER=1.11.2
 
 RUN \
   yum install -y java-1.6.0-openjdk && \
-  yum update && \
+  yum update -y && \
   firewall-cmd --zone=public --permanent --add-port=25565/tcp && \
   firewall-cmd --reload && \
 
