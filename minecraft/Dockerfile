@@ -6,15 +6,15 @@ ENV MINECRAFT_VER=1.11.2
 RUN \
   yum install -y java-1.6.0-openjdk && \
   yum update -y && \
-  firewall-cmd --zone=public --permanent --add-port=25565/tcp && \
-  firewall-cmd --reload && \
 
   mkdir minecraft && \
   cd minecraft && \
-  wget -O minecraft_server.jar https://s3.amazonaws.com/Minecraft.Download/versions/${MINECRAFT_VER}/minecraft_server.{MINECRAFT_VER}.jar && \
+  wget -O minecraft_server.jar https://s3.amazonaws.com/Minecraft.Download/versions/${MINECRAFT_VER}/minecraft_server.${MINECRAFT_VER}.jar && \
   chmod +x minecraft_server.jar && \
-  screen && \
   echo "eula=true" > eula.txt && \
+
+  firewall-cmd --zone=public --permanent --add-port=25565/tcp && \
+  firewall-cmd --reload && \
 
 EXPOSE 25565:25565
 
