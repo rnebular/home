@@ -25,3 +25,8 @@ aws s3 cp --recursive s3://rnebular-shared/minecraft/dockervolumes /dockervols
 
 copy from instance to s3:
 aws s3 cp --recursive /dockervols s3://rnebular-shared/minecraft/dockervolumes
+
+## Need to redo
+- Docker run commands need `--restart always` added to them - Restarts the container unless manually stopped.
+
+?
