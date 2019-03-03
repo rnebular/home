@@ -1,6 +1,8 @@
 # Stuff for the mc-ship instance
 This instance is simply an Amazon Linux EC2 instance, that runs docker containers for Minecraft.
 
+- The instance has an elastic IP, bound to a DNS name in Route53: `mc.8dot3.net`
+
 ## User Data
 ```
 #!/bin/bash
@@ -26,9 +28,7 @@ aws s3 cp --recursive s3://rnebular-shared/minecraft/dockervolumes /dockervols
 copy from instance to s3:
 aws s3 cp --recursive /dockervols s3://rnebular-shared/minecraft/dockervolumes
 
-## Need to redo
-- Docker run commands need `--restart always` added to them - Restarts the container unless manually stopped.
-
+## Docker executable information
 - 8BIT:
 `docker run -dit -e VERSION=1.12.2 --restart always -p 25565:25565 -v /dockervols/8BIT:/data --name 8BIT itzg/minecraft-server:latest`
 
