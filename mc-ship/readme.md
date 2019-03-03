@@ -30,7 +30,7 @@ aws s3 cp --recursive /dockervols s3://rnebular-shared/minecraft/dockervolumes
 - Docker run commands need `--restart always` added to them - Restarts the container unless manually stopped.
 
 - 8BIT:
-`docker run -dit --restart always -p 25565:25565 -v /dockervols/8BIT:/data --name 8BIT itzg/minecraft-server:1.12.2`
+`docker run -dit -e VERSION=1.12.2 --restart always -p 25565:25565 -v /dockervols/8BIT:/data --name 8BIT itzg/minecraft-server:latest`
 
 - SurvivalBigVillage:
 `docker run -dit --restart always -p 25568:25565 -v /dockervols/SurvivalBigVillage:/data --name SurvivalBigVillage itzg/minecraft-server:latest`
