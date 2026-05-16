@@ -1,0 +1,22 @@
+services:
+  mc:
+    image: itzg/minecraft-server:java21
+    environment:
+      EULA: true
+      MODPACK_PLATFORM: AUTO_CURSEFORGE
+      # Allocate API key from https://console.curseforge.com/
+      # and set in .env file making sure to double up dollar signs, such as
+      # CF_API_KEY=$$2a$$10$$....
+      # Refer to https://docker-minecraft-server.readthedocs.io/en/latest/types-and-platforms/mod-platforms/auto-curseforge/#api-key
+      CF_API_KEY: ${CF_API_KEY}
+      CF_SLUG: better-mc-forge-bmc4
+      CF_FORCE_INCLUDE_MODS: true
+#      CF_FILENAME_MATCHER: v18.5
+      MEMORY: 8G
+    volumes:
+      - mc:/data
+    ports:
+      - "25565:25565"
+
+volumes:
+  mc: {}
