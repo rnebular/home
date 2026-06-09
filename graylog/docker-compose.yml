@@ -20,7 +20,7 @@ services:
   # echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
   # sudo sysctl -p
   datanode:
-    image: "${DATANODE_IMAGE:-graylog/graylog-datanode:7.1}"
+    image: "${DATANODE_IMAGE:-graylog/graylog-datanode:7.1.2}"
     hostname: "datanode"
     environment:
       GRAYLOG_DATANODE_NODE_ID_FILE: "/var/lib/graylog-datanode/node-id"
@@ -47,7 +47,7 @@ services:
   # Graylog: https://hub.docker.com/r/graylog/graylog-enterprise
   graylog:
     hostname: "server"
-    image: "${GRAYLOG_IMAGE:-graylog/graylog:7.1}"
+    image: "${GRAYLOG_IMAGE:-graylog/graylog:7.1.2}"
     depends_on:
       mongodb:
         condition: "service_started"
@@ -63,6 +63,8 @@ services:
       GRAYLOG_HTTP_EXTERNAL_URI: "http://192.168.1.20:9000/"
       GRAYLOG_MONGODB_URI: "mongodb://mongodb:27017/graylog"
     ports:
+    - "514:514/udp"     # Syslog
+    - "514:514/tcp"     # Syslog
     - "5044:5044/tcp"   # Beats
     - "5140:5140/udp"   # Syslog
     - "5140:5140/tcp"   # Syslog
