@@ -1,0 +1,42 @@
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:v3.20.1
+    container_name: mealie
+    restart: always
+    # ports:
+    #     - "9925:9000" # 
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mealie.rule=Host(`mealtime.8dot3.net`)"   # <-- change to your domain
+      - "traefik.http.routers.mealie.entrypoints=websecure"
+      - "traefik.http.routers.mealie.tls=true"
+      - "traefik.http.services.mealie.loadbalancer.server.port=9000"   # Mealie's internal port    deploy:
+    resources:
+        limits:
+          memory: 1000M # 
+    volumes:
+      - /home/jon/mealie/mealie-data:/app/data/
+    environment:
+      # Set Backend ENV Variables Here
+      ALLOW_SIGNUP: "false"
+      PUID: 1000
+      PGID: 1000
+      TZ: America/Anchorage
+      BASE_URL: https://mealtime.8dot3.net
+      API_DOCS: "true"
+      SMTP_HOST: smtp.gmail.com
+      SMTP_FROM_NAME: Mealie
+      SMTP_FROM_EMAIL: jtbyrum@gmail.com
+      SMTP_USER: jtbyrum@gmail.com
+      SMTP_PASSWORD: wuus grad scnv cfjz # app password
+      # TLS_CERTIFICATE_PATH: /app/data/cert.pem
+      # TLS_PRIVATE_KEY_PATH: /app/data/private_key_clean.pem
+
+volumes:
+  mealie-data:
+
+networks:
+  proxy:
+    external: true

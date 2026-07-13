@@ -1,0 +1,15 @@
+http:
+  routers:
+    plex:
+      rule: "Host(`plex.8dot3.net`)"
+      entryPoints:
+        - websecure
+      service: plex
+      tls:
+        certResolver: letsencrypt
+
+  services:
+    plex:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:32400"

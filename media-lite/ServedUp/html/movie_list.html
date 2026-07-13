@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Movie Library</title>
+<style>
+  :root {
+    --bg: #14161a;
+    --panel: #1c1f25;
+    --border: #2b2f37;
+    --text: #e8e9ec;
+    --muted: #8b909c;
+    --accent: #5b8cff;
+    --row-hover: #23262e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 32px 24px 60px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  #search {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+  }
+  #search:focus {
+    border-color: var(--accent);
+  }
+  #count {
+    color: var(--muted);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  thead th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    background: #20232a;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  thead th:hover {
+    color: var(--text);
+  }
+  thead th .arrow {
+    margin-left: 4px;
+    opacity: 0.5;
+    font-size: 10px;
+  }
+  thead th.active .arrow {
+    opacity: 1;
+    color: var(--accent);
+  }
+  tbody td {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  tbody tr:hover {
+    background: var(--row-hover);
+  }
+  td.duration {
+    color: var(--muted);
+    white-space: nowrap;
+    width: 110px;
+  }
+  th.duration-col {
+    width: 110px;
+  }
+  .empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Movie Library</h1>
+  <div class="subtitle" id="subtitle"></div>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search movies...">
+    <span id="count"></span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th data-key="name" data-type="string">Title <span class="arrow"></span></th>
+        <th data-key="minutes" data-type="number" class="duration-col">Length <span class="arrow"></span></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+let MOVIES = [];
+
+let sortKey = 'name';
+let sortDir = 1; // 1 asc, -1 desc
+
+const tbody = document.getElementById('tbody');
+const searchInput = document.getElementById('search');
+const countEl = document.getElementById('count');
+const subtitle = document.getElementById('subtitle');
+
+fetch('movies.json')
+  .then(res => {
+    if (!res.ok) throw new Error('Failed to load movies.json');
+    return res.json();
+  })
+  .then(data => {
+    MOVIES = data;
+    subtitle.textContent = `${MOVIES.length} movies`;
+    render();
+  })
+  .catch(err => {
+    subtitle.textContent = 'Could not load movies.json';
+    tbody.innerHTML = `<tr><td colspan="2" class="empty">
+      Couldn't load movies.json. If you opened this file directly (file://),
+      browsers block that for security reasons — try running a local server instead,
+      e.g. <code>python3 -m http.server</code> in this folder, then open
+      <code>http://localhost:8000/movie_list.html</code>.
+    </td></tr>`;
+  });
+
+function render() {
+  const q = searchInput.value.trim().toLowerCase();
+  let rows = MOVIES.filter(m => m.name.toLowerCase().includes(q));
+
+  rows.sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (typeof av === 'string') {
+      av = av.toLowerCase();
+      bv = bv.toLowerCase();
+    }
+    if (av < bv) return -1 * sortDir;
+    if (av > bv) return 1 * sortDir;
+    return 0;
+  });
+
+  countEl.textContent = `${rows.length} shown`;
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="2" class="empty">No movies match your search.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(m => `
+    <tr>
+      <td>${escapeHtml(m.name)}</td>
+      <td class="duration">${m.duration}</td>
+    </tr>
+  `).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+document.querySelectorAll('th[data-key]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.key;
+    if (sortKey === key) {
+      sortDir *= -1;
+    } else {
+      sortKey = key;
+      sortDir = 1;
+    }
+    document.querySelectorAll('th[data-key]').forEach(t => {
+      t.classList.remove('active');
+      t.querySelector('.arrow').textContent = '';
+    });
+    th.classList.add('active');
+    th.querySelector('.arrow').textContent = sortDir === 1 ? '▲' : '▼';
+    render();
+  });
+});
+
+searchInput.addEventListener('input', render);
+
+// initial sort indicator
+document.querySelector('th[data-key="name"]').classList.add('active');
+document.querySelector('th[data-key="name"] .arrow').textContent = '▲';
+</script>
+</body>
+</html>

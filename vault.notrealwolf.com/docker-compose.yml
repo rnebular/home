@@ -1,0 +1,19 @@
+services:
+  movie-site:
+    image: nginx:alpine
+    container_name: notrealwolf-vault
+    restart: unless-stopped
+    volumes:
+      - /mnt/nas_share/Bradley/Vault:/usr/share/nginx/html:ro
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vault.rule=Host(`vault.notrealwolf.com`)"   # <-- change to your domain
+      - "traefik.http.routers.vault.entrypoints=websecure"
+      - "traefik.http.routers.vault.tls.certresolver=letsencrypt"
+      - "traefik.http.services.vault.loadbalancer.server.port=80"
+
+networks:
+  proxy:
+    external: true

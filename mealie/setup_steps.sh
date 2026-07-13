@@ -14,40 +14,7 @@ apt install docker-compose-plugin
 # installing using SQLite for simplicity
 mkdir -p /home/<username>/mealie && cd /home/<username>/mealie
 
-# write the docker-compose file (may need to sudo su for this step, permissions ugh)
-cat > docker-compose.yaml <<EOF
-services:
-  mealie:
-    image: ghcr.io/mealie-recipes/mealie:v3.10.0 # 
-    container_name: mealie
-    restart: always
-    ports:
-        - "9925:9000" # 
-    deploy:
-      resources:
-        limits:
-          memory: 1000M # 
-    volumes:
-      - /home/<username>/mealie/mealie-data:/app/data/
-    environment:
-      # Set Backend ENV Variables Here
-      ALLOW_SIGNUP: "false"
-      PUID: 1000
-      PGID: 1000
-      TZ: America/Anchorage
-      BASE_URL: https://mealtime.8dot3.net:9925
-      API_DOCS: "true"
-      SMTP_HOST: smtp.gmail.com
-      SMTP_FROM_NAME: Mealie
-      SMTP_FROM_EMAIL: jtbyrum@gmail.com
-      SMTP_USER: jtbyrum@gmail.com
-      SMTP_PASSWORD: wuus grad scnv cfjz # app password
-      TLS_CERTIFICATE_PATH: /app/data/cert.pem
-      TLS_PRIVATE_KEY_PATH: /app/data/private_key_clean.pem
-
-volumes:
-  mealie-data:
-EOF
+# copy/create the docker-compose.yml file into this folder ^
 
 # create the data directory that will mount to /app/data
 mkdir mealie-data && cd mealie-data
