@@ -13,6 +13,11 @@ services:
       CF_FORCE_INCLUDE_MODS: true
 #      CF_FILENAME_MATCHER: v18.5
       MEMORY: 8G
+      
+      # Modrinth additions
+      MODRINTH_PROJECTS: |
+        disabilities
+      MODRINTH_DOWNLOAD_DEPENDENCIES: required
     volumes:
       - mc:/data
     ports:
